@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Show Parsed Json</title>
+</head>
+<body>
+    <div id='app'>
+        <folder :value="val"></folder>
+    </div>
+    <script src="http://cdn.jsdelivr.net/vue/1.0.24/vue.js"></script>
+    <script src="http://cdn.jsdelivr.net/jquery/2.0.0/jquery-2.0.0.min.js"></script>
+    <script type="text/javascript">
+        var data = $.get()
+    </script>
+    <script type="text/javascript">
+    
+    Vue.component("MyItem", Vue.extend({
+        props: ["value"],
+        template: "<span><img v-if='value.icon' :src=\"value.icon\" /><a :href='value.href'><b>{{value.name}}</b></a></span>"
+    }))
+    
+    Vue.component("Folder", Vue.extend({
+        props: ["value"],
+        template: "<div><h3>{{value.name}}</h3><ul><li v-if='value.children' v-for='i in value.children'><folder v-if='i.type==\"folder\"' :value=\"i\"></folder><my-item v-if='i.type==\"url\"' :value=\"i\" ></my-item></li></ul></div>"
+    }))
+
+    function processItem(item) {
+        if(item.type === "url") 
+            return {
+                name: item.name,
+                href: item.href,
+                type: "url",
+                icon: item.icon || item.icon_uri
+            }
+        else
+            return processFolder(item)
+    }
+    function processItems(items) {
+        return items.map(processItem)
+    }
+    function processFolder(item) {
+        return {
+            name: item.name,
+            type: "folder",
+            children: processItems(item.children)
+        }
+    }
+    
+    var app = new Vue({
+        el: '#app',
+        data: {
+            val: {type: "none"}
+        }
+    })
+    
+    $.getJSON("./bookmarks.json").done(function(data) {
+        app.val = processFolder(data)
+    })
+    </script>
+</body>
+</html>
