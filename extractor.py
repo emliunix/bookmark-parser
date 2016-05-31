@@ -6,36 +6,42 @@ from bmparser import *
 
 ignoreTags = {"META", "HR"}
 
-class TokenIter:
+class TokenIter(object):
+    '''
+    Utility class to work with tokens
+    '''
     def __init__(self, tokens):
         self.tokens = tokens
         self.position = 0
         self.length = len(self.tokens)
-        self.posMarks = []
-    
+        self.pos_marks = []
+
     def next(self):
+        '''
+        retrive next token
+        '''
         while self.position < self.length:
-            v = self.tokens[self.position]
+            tok = self.tokens[self.position]
             self.position += 1
-            if not (v[0] == Type.TAG and v[1] in ignoreTags):
-                return v
+            if not (tok[0] == Type.TAG and tok[1] in ignoreTags):
+                return tok
         return None
-        
+
     def peek(self):
         return self.tokens[self.position]
-        
+
     def moveBack(self):
         self.position -= 1
-        
+
     def mark(self):
-        self.posMarks.append(self.position)
-        
+        self.pos_marks.append(self.position)
+
     def ok(self):
-        self.posMarks.pop()
-        
+        self.pos_marks.pop()
+
     def unmark(self):
-        self.position = self.posMarks.pop()
-        
+        self.position = self.pos_marks.pop()
+
 def debugError(msg, tok):
     print("%s\n%s\n" % (msg, str(tok)))
 
